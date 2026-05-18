@@ -1,5 +1,5 @@
 import './styles.css';
-import { MockBackendClient } from './mockBackend';
+import { createBackendClient } from './backend';
 import { createRequestId } from './requestId';
 import type { BackendClient, ImageResult, KioskState, SearchResponse } from './types';
 
@@ -39,7 +39,7 @@ interface AppModel {
 }
 
 const galleryIdleMs = 120_000;
-const backend: BackendClient = new MockBackendClient();
+const backend: BackendClient = createBackendClient();
 const root = document.querySelector<HTMLDivElement>('#app');
 
 if (!root) {
