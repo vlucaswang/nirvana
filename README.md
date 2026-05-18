@@ -33,3 +33,9 @@ docker compose -f automation/deploy/docker-compose.yml up --build
 ## Project Guidance
 
 Read `AGENTS.md` before making architectural changes.
+
+## CI and Release
+
+GitHub Actions run kiosk tests, builds, container builds, semantic-release, and DockerHub publishing.
+
+See `docs/deployment/github_actions.md`.

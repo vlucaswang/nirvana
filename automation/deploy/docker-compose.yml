@@ -40,7 +40,6 @@ services:
         VITE_BACKEND_MODE: http
         VITE_SEARCH_WEBHOOK_URL: /webhook/search
         VITE_PRINT_WEBHOOK_URL: /webhook/print
-        VITE_KIOSK_AUTH_HEADER: X-Nirvana-Kiosk-Key
     depends_on:
       - n8n
     ports:
