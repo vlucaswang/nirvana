@@ -12,7 +12,7 @@ It performs:
 *   kiosk tests
 *   kiosk production build
 *   Docker Compose config validation
-*   kiosk container build without pushing
+*   kiosk container build without pushing for `linux/amd64` and `linux/arm64`
 
 ### Release
 `.github/workflows/release.yml` runs on pushes to `main`.
@@ -23,7 +23,7 @@ It performs:
 *   Docker Compose config validation
 *   semantic-release
 *   DockerHub login
-*   kiosk image build and push when semantic-release publishes a new release
+*   kiosk multi-platform image build and push when semantic-release publishes a new release
 
 ## Semantic Release
 
@@ -79,7 +79,14 @@ xiaochuanwang/nirvana-kiosk
 
 ## Docker Image Tags
 
-On each semantic-release publication, the release workflow pushes:
+On each semantic-release publication, the release workflow pushes a multi-platform Docker image for:
+
+```text
+linux/amd64
+linux/arm64
+```
+
+The pushed tags are:
 
 ```text
 latest
