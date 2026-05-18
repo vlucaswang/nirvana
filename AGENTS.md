@@ -168,4 +168,3 @@ Read these before major architectural changes:
 *   `docs/drafts/kiosk_frontend.md`
 *   `docs/drafts/home_smart_center_tech_selection.md`
 *   `docs/drafts/repo_architecture.md`
-*   `PROMPT.md`

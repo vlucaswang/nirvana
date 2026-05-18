@@ -42,7 +42,7 @@ Strengths:
 *   Full control over the user journey: large microphone button, listening animation, image gallery, enlarge/preview, print button, and post-print result screen.
 *   Easier to make child-friendly and session-oriented.
 *   Does not require exposing Home Assistant admin UI or dashboard editing behavior on the iPad.
-*   Can call n8n, Home Assistant, and the print service through narrow local APIs.
+*   Can call n8n, Home Assistant, and local printer workflows through narrow local APIs.
 *   Can be tested like a normal web app and installed to iPad Home Screen.
 
 Tradeoffs:
@@ -97,7 +97,7 @@ Strengths:
 Tradeoffs:
 *   n8n uses a fair-code style license rather than a simple permissive open-source license.
 *   Complex workflows can become hard to maintain unless naming and sub-workflows are disciplined.
-*   Direct printer control may still be cleaner through a small local print service.
+*   Direct printer control can use CUPS/IPP first, with a small local print service added later only if needed.
 
 Best role in this project:
 *   Primary orchestrator for kiosk webhooks, LLM intent routing, image search, filtering, cache coordination, and print job dispatch.
@@ -185,7 +185,7 @@ n8n Print Workflow
   | validate selected image_id
   | fetch cached image or print_url
   | normalize to printable format
-  | call print service
+  | call local printer through CUPS/IPP
   v
 Print status response
 ```
