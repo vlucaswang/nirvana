@@ -18,6 +18,18 @@ npm install
 npm run dev
 ```
 
+## Full Stack Compose
+
+```sh
+automation/scripts/test_compose_stack.sh
+```
+
+For a manual run:
+
+```sh
+docker compose -f automation/deploy/docker-compose.yml up --build
+```
+
 ## Project Guidance
 
 Read `AGENTS.md` before making architectural changes.

@@ -35,3 +35,11 @@ coverage/
 .env
 .env.local
 .env.*.local
+
+# Local automation runtime state
+automation/**/.env
+automation/**/data/
+automation/**/.n8n/
+automation/**/cache/
+automation/**/downloads/
+automation/**/tmp/
