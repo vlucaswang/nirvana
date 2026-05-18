@@ -24,3 +24,14 @@ Icon[
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# JavaScript
+node_modules/
+dist/
+.vite/
+coverage/
+
+# Local environment
+.env
+.env.local
+.env.*.local
