@@ -1,12 +1,14 @@
 # Nirvana
 
-Nirvana is an iPad kiosk frontend for a local-only home command center.
+Nirvana is a local-only home command center monorepo.
 
 The first workflow lets a user ask for a coloring page, browse image results, select one, and send it to a local n8n print workflow.
 
-## Apps
+## Layout
 
 *   `apps/kiosk`: Vite + TypeScript kiosk web app.
+*   `automation`: local n8n, printer, LLM, and deployment assets.
+*   `docs/api`: shared webhook contracts.
 
 ## Local Development
 

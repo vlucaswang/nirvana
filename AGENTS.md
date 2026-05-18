@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project Goal
-Build `nirvana` as the iPad kiosk frontend for a local-only home assistant-style command center.
+Build `nirvana` as a local-only home command center monorepo.
 
 The first product journey is:
 1. A user taps a large microphone button on an iPad kiosk.
@@ -13,7 +13,7 @@ The first product journey is:
 7. The kiosk shows success or a user-safe error message.
 
 ## Repository Scope
-This repository owns the kiosk app and public interface contracts.
+This repository owns the kiosk app, local automation assets, and public interface contracts.
 
 Keep in this repo:
 *   iPad kiosk frontend source code.
@@ -22,16 +22,18 @@ Keep in this repo:
 *   Mock API responses and frontend tests.
 *   Public API contract docs.
 *   iPad kiosk deployment notes.
+*   n8n workflow exports.
+*   Local n8n deployment examples.
+*   Printer setup notes and non-secret CUPS/IPP examples.
+*   Local LLM prompts and setup notes.
 
 Do not put in this repo:
-*   n8n workflow exports.
-*   n8n credentials or local deployment state.
-*   printer IP addresses or CUPS configuration.
+*   n8n credentials or live local deployment state.
+*   real printer IP addresses if they are home-specific.
+*   live CUPS configuration with local hostnames or secrets.
 *   local LLM runtime files.
 *   Home Assistant tokens.
 *   real `.env` secrets.
-
-Backend/local automation should live in a separate repo, currently expected to be `nirvana-local-automation`.
 
 ## Architecture Decisions
 *   Use a dedicated kiosk web app for the iPad frontend.
@@ -133,6 +135,17 @@ nirvana/
       tests/
       package.json
       vite.config.ts
+  automation/
+    n8n/
+      workflows/
+      credentials.example.md
+    printer/
+      brother-dcp-l3560cdw.md
+    llm/
+      prompts/
+    deploy/
+      docker-compose.yml
+    scripts/
   docs/
     drafts/
     api/
@@ -145,6 +158,8 @@ nirvana/
 ```
 
 Prefer a small Vite app for the kiosk. A zero-build HTML app is acceptable for prototypes, but Vite is preferred once implementation starts because it gives better TypeScript, testing, asset handling, and local development while still producing static files.
+
+Keep backend/local automation in `automation/`. Keep app code in `apps/`. The boundary between them is the documented webhook contract under `docs/api/`.
 
 ## Environment Variables
 Use public frontend environment variables only for non-secret configuration.
