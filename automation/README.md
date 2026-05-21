@@ -33,3 +33,5 @@ The script builds and starts the stack, verifies the kiosk server responds, veri
 ```sh
 docker compose -f automation/deploy/docker-compose.yml down
 ```
+
+For a real home-network deployment runbook, see `../docs/deployment/real_environment.md`.

@@ -30,6 +30,8 @@ For a manual run:
 docker compose -f automation/deploy/docker-compose.yml up --build
 ```
 
+For a home-network deployment runbook, see `docs/deployment/real_environment.md`.
+
 ## Project Guidance
 
 Read `AGENTS.md` before making architectural changes.
