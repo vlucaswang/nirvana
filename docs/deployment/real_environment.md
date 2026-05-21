@@ -6,6 +6,7 @@ The current production-like target is one always-on local Docker host that runs:
 
 *   `kiosk`: the iPad web frontend served by nginx.
 *   `n8n`: the local workflow orchestrator.
+*   `searxng`: the local metasearch service used by the search workflow.
 *   n8n workflow data in a local Docker volume.
 
 The iPad opens the kiosk URL from the local network. The kiosk calls `/webhook/search` and `/webhook/print`; nginx proxies those requests to n8n inside Docker Compose.
@@ -15,11 +16,12 @@ The iPad opens the kiosk URL from the local network. The kiosk calls `/webhook/s
 The repo can already:
 
 *   run the full local stack with Docker Compose
-*   import mock n8n search and print workflows
+*   import a real n8n search workflow backed by local SearXNG
+*   import a mock n8n print workflow
 *   smoke test the kiosk and webhook proxy
 *   build and publish multi-platform kiosk images for `linux/amd64` and `linux/arm64`
 
-The repo does not yet contain a real search workflow or real printer workflow. The current n8n workflows are safe mocks.
+The repo does not yet contain a real printer workflow. The current print workflow is a safe mock.
 
 ## Hardware Target
 
@@ -53,6 +55,7 @@ Open these from a computer on the same LAN:
 ```text
 http://<docker-host>:5173
 http://<docker-host>:5678
+http://<docker-host>:8080
 ```
 
 Run the smoke test from the repo:
@@ -94,13 +97,12 @@ See `docs/deployment/github_actions.md`.
 
 ## Real Workflow Work Remaining
 
-Before this is useful as the real home workflow, replace the mock n8n workflows with local production workflows:
+Before this is useful as the real home workflow, finish the remaining local production workflows:
 
 1. Search workflow
-   *   Accept `POST /webhook/search`.
-   *   Normalize the user's request.
-   *   Use a local LLM/router where needed.
-   *   Return structured image objects matching `docs/api/kiosk_backend_contract.md`.
+   *   The repo now includes a real SearXNG-backed `POST /webhook/search` workflow.
+   *   Later hardening can add a local LLM/router for better intent extraction.
+   *   Consider pinning the SearXNG image tag once the deployment target is stable.
 
 2. Print workflow
    *   Accept `POST /webhook/print`.
@@ -151,4 +153,3 @@ docker compose -f automation/deploy/docker-compose.yml down --volumes
 ```
 
 Only reset volumes in development or when intentionally wiping local n8n state.
-

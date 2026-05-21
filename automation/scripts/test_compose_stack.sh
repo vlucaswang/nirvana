@@ -39,12 +39,18 @@ payload = json.loads(sys.argv[2])
 if expected == "search":
     assert payload["request_id"] == "kiosk-2026-05-17T06:30:00.000Z-8f3a"
     assert payload["query"] == "mermaid coloring page"
-    assert isinstance(payload["images"], list) and payload["images"]
-    first = payload["images"][0]
-    assert first["id"] == "img_01"
-    assert first["thumbnail_url"].startswith("data:image/svg+xml")
-    assert first["print_url"] == "https://example.com/mermaid1-print.jpg"
-    assert first["printable"] is True
+    assert isinstance(payload["images"], list)
+    for index, image in enumerate(payload["images"], start=1):
+        assert image["id"] == f"img_{index:02d}"
+        assert image["title"]
+        assert image["source"]
+        assert image["thumbnail_url"].startswith(("http://", "https://"))
+        assert image["full_url"].startswith(("http://", "https://"))
+        assert image["print_url"].startswith(("http://", "https://"))
+        assert image["content_type"].startswith("image/")
+        assert isinstance(image["width"], int) and image["width"] > 0
+        assert isinstance(image["height"], int) and image["height"] > 0
+        assert image["printable"] is True
 elif expected == "print":
     assert payload == {
         "request_id": "kiosk-2026-05-17T06:30:00.000Z-8f3a",
