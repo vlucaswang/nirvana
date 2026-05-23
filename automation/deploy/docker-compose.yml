@@ -1,6 +1,6 @@
 services:
   n8n-import:
-    image: n8nio/n8n:1.96.0
+    image: nirvana-n8n:local
     entrypoint: /bin/sh
     command: ["-c", "n8n import:workflow --separate --input=/workflows && n8n update:workflow --all --active=true"]
     environment:
@@ -12,7 +12,9 @@ services:
     restart: "no"
 
   n8n:
-    image: n8nio/n8n:1.96.0
+    build:
+      context: ../n8n
+    image: nirvana-n8n:local
     depends_on:
       n8n-import:
         condition: service_completed_successfully
@@ -31,8 +33,13 @@ services:
       N8N_PERSONALIZATION_ENABLED: "false"
       N8N_SECURE_COOKIE: "false"
       N8N_RUNNERS_ENABLED: "true"
+      NIRVANA_PRINT_MODE: "${NIRVANA_PRINT_MODE:-mock}"
+      NIRVANA_PRINTER_NAME: "${NIRVANA_PRINTER_NAME:-}"
+      CUPS_SERVER: "${CUPS_SERVER:-}"
       SEARXNG_BASE_URL: "http://searxng:8080"
       WEBHOOK_URL: "http://localhost:${N8N_PUBLIC_PORT:-5678}/"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - n8n_data:/home/node/.n8n
 

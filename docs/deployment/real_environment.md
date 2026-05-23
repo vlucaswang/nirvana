@@ -17,11 +17,11 @@ The repo can already:
 
 *   run the full local stack with Docker Compose
 *   import a real n8n search workflow backed by local SearXNG
-*   import a mock n8n print workflow
+*   import a real n8n print workflow with a mock mode for smoke tests
 *   smoke test the kiosk and webhook proxy
 *   build and publish multi-platform kiosk images for `linux/amd64` and `linux/arm64`
 
-The repo does not yet contain a real printer workflow. The current print workflow is a safe mock.
+The print workflow is configured with `NIRVANA_PRINT_MODE=mock` by default for safe local smoke tests. Set `NIRVANA_PRINT_MODE=cups`, `NIRVANA_PRINTER_NAME`, and `CUPS_SERVER` in the real environment to print through local CUPS.
 
 ## Hardware Target
 
@@ -105,10 +105,9 @@ Before this is useful as the real home workflow, finish the remaining local prod
    *   Consider pinning the SearXNG image tag once the deployment target is stable.
 
 2. Print workflow
-   *   Accept `POST /webhook/print`.
-   *   Validate the selected image.
-   *   Print through local IPP/CUPS or another local protocol supported by the Brother DCP-L3560CDW.
-   *   Return a user-safe success or error message.
+   *   The repo now includes a real `POST /webhook/print` workflow.
+   *   The workflow validates the selected image URL, calls a local print script, and returns a user-safe success or error message.
+   *   Real printer submission uses CUPS through `NIRVANA_PRINT_MODE=cups`, `NIRVANA_PRINTER_NAME`, and `CUPS_SERVER`.
 
 3. Printer setup
    *   Configure printer access on the Docker host.

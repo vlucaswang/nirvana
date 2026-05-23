@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+const { spawn } = require('node:child_process');
+const { mkdir, rm, writeFile } = require('node:fs/promises');
+const { tmpdir } = require('node:os');
+const { join } = require('node:path');
+
+const [requestId = 'missing-request-id', imageId = 'unknown-image', printUrl = ''] = process.argv.slice(2);
+const mode = process.env.NIRVANA_PRINT_MODE || 'mock';
+const printerName = process.env.NIRVANA_PRINTER_NAME || '';
+
+function respond(status, message, extra = {}) {
+  process.stdout.write(JSON.stringify({
+    request_id: requestId,
+    status,
+    message,
+    ...extra,
+  }));
+}
+
+function userSafeError(message) {
+  respond('error', message);
+}
+
+function validatePrintUrl(value) {
+  if (/\[[^\]]+\]\([^)]+\)/.test(value)) {
+    throw new Error('Markdown links are not valid print URLs.');
+  }
+
+  const parsed = new URL(value);
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error('Only local HTTP or HTTPS print URLs are supported.');
+  }
+
+  return parsed.toString();
+}
+
+function run(command, args) {
+  return new Promise((resolve) => {
+    const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', (error) => {
+      resolve({ code: 127, stdout, stderr: error.message });
+    });
+    child.on('close', (code) => {
+      resolve({ code: code ?? 0, stdout, stderr });
+    });
+  });
+}
+
+async function downloadImage(url, targetPath) {
+  const response = await fetch(url, {
+    headers: { Accept: 'image/*,*/*;q=0.8' },
+    signal: AbortSignal.timeout(30000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Image download failed with HTTP ${response.status}.`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType && !contentType.toLowerCase().startsWith('image/')) {
+    throw new Error('The selected URL did not return an image.');
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  if (buffer.length === 0) {
+    throw new Error('The selected image was empty.');
+  }
+
+  await writeFile(targetPath, buffer);
+}
+
+async function printWithCups(url) {
+  if (!printerName) {
+    userSafeError('The printer is not configured. Please try again later.');
+    return;
+  }
+
+  const workDir = await mkdir(join(tmpdir(), `nirvana-print-${Date.now()}-${process.pid}`), { recursive: true });
+  const imagePath = join(workDir, `${imageId}.image`);
+
+  try {
+    await downloadImage(url, imagePath);
+
+    const lp = await run('lp', [
+      '-d',
+      printerName,
+      '-o',
+      'fit-to-page',
+      '-t',
+      `Nirvana ${imageId}`,
+      imagePath,
+    ]);
+
+    if (lp.code !== 0) {
+      console.error(lp.stderr || lp.stdout || `lp exited with ${lp.code}`);
+      userSafeError('The printer is offline. Please try again later.');
+      return;
+    }
+
+    respond('success', 'Sent to printer', {
+      image_id: imageId,
+      lp_output: lp.stdout.trim(),
+    });
+  } finally {
+    await rm(workDir, { recursive: true, force: true });
+  }
+}
+
+async function main() {
+  let url;
+  try {
+    url = validatePrintUrl(printUrl);
+  } catch {
+    userSafeError('That image cannot be printed. Please choose another page.');
+    return;
+  }
+
+  if (mode === 'mock') {
+    respond('success', `Sent ${imageId} to printer`, { image_id: imageId, print_url: url });
+    return;
+  }
+
+  if (mode !== 'cups') {
+    userSafeError('The printer is not configured. Please try again later.');
+    return;
+  }
+
+  try {
+    await printWithCups(url);
+  } catch (error) {
+    console.error(error?.message || error);
+    userSafeError('The printer is offline. Please try again later.');
+  }
+}
+
+main();

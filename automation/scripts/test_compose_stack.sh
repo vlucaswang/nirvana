@@ -52,11 +52,11 @@ if expected == "search":
         assert isinstance(image["height"], int) and image["height"] > 0
         assert image["printable"] is True
 elif expected == "print":
-    assert payload == {
-        "request_id": "kiosk-2026-05-17T06:30:00.000Z-8f3a",
-        "status": "success",
-        "message": "Sent img_01 to printer",
-    }
+    assert payload["request_id"] == "kiosk-2026-05-17T06:30:00.000Z-8f3a"
+    assert payload["status"] == "success"
+    assert payload["message"] == "Sent img_01 to printer"
+    assert payload["image_id"] == "img_01"
+    assert payload["print_url"] == "https://example.com/mermaid1-print.jpg"
 else:
     raise AssertionError(f"unknown assertion target: {expected}")
 PY

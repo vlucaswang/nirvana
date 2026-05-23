@@ -1,0 +1,94 @@
+{
+  "name": "Kiosk Print",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "print",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "69728d7d-f24c-4604-ac33-8f294cc07ebc",
+      "name": "POST /webhook/print",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "kiosk-print"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\n\nfunction shellQuote(value) {\n  return `'${String(value).replace(/'/g, `'\\\\''`)}'`;\n}\n\nconst requestId = String(body.request_id ?? '').trim() || 'missing-request-id';\nconst imageId = String(body.image_id ?? '').trim() || 'unknown-image';\nconst printUrl = String(body.print_url ?? '').trim();\n\nreturn [{\n  json: {\n    command: [\n      '/usr/local/bin/nirvana-print',\n      shellQuote(requestId),\n      shellQuote(imageId),\n      shellQuote(printUrl),\n    ].join(' '),\n  },\n}];"
+      },
+      "id": "a8b9f0de-817c-4ee1-b128-631db0ee6ac7",
+      "name": "Prepare print command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "id": "3211de78-c939-45b9-8075-c56bcddab1d4",
+      "name": "Submit to local printer",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = String($json.stdout ?? '').trim();\n\ntry {\n  const parsed = JSON.parse(stdout);\n  return [{ json: parsed }];\n} catch {\n  return [{\n    json: {\n      request_id: 'missing-request-id',\n      status: 'error',\n      message: 'The printer is offline. Please try again later.',\n    },\n  }];\n}"
+      },
+      "id": "41fd0b8c-dbeb-4199-a986-e8f197956626",
+      "name": "Build print response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 0]
+    }
+  ],
+  "connections": {
+    "POST /webhook/print": {
+      "main": [
+        [
+          {
+            "node": "Prepare print command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare print command": {
+      "main": [
+        [
+          {
+            "node": "Submit to local printer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit to local printer": {
+      "main": [
+        [
+          {
+            "node": "Build print response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-05-23T00:00:00.000Z",
+  "versionId": "aa99251e-7b18-49a7-a8e6-f7eb3699e9fd",
+  "active": true
+}

@@ -4,7 +4,7 @@ This folder contains local-only backend assets for Nirvana.
 
 The MVP Docker Compose stack runs:
 
-*   `n8n`: local workflow orchestrator with a real search webhook and mocked print webhook.
+*   `n8n`: local workflow orchestrator with real search and print webhooks.
 *   `searxng`: local metasearch service used by the search webhook.
 *   `kiosk`: built static kiosk app served by nginx, with `/webhook/*` proxied to n8n.
 
@@ -28,7 +28,7 @@ Open:
 automation/scripts/test_compose_stack.sh
 ```
 
-The script builds and starts the stack, verifies the kiosk server responds, verifies the search and mocked print webhooks through the kiosk proxy, then tears the stack down.
+The script builds and starts the stack, verifies the kiosk server responds, verifies the search and print webhooks through the kiosk proxy, then tears the stack down.
 
 ## Stop
 
